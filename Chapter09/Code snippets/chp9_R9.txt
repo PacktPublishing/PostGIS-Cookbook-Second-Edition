@@ -1,0 +1,28 @@
+--Chapter 9
+--Recipe 9
+
+--How to do it
+--Step 1.
+ogr2ogr -f GeoJSON 
+tracks.json \
+ "PG:host=localhost dbname=postgis_cookbook user=me" \
+  -sql "select * from chp03.tracks
+
+--Step 7.
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
+
+--Step 8.
+<div id='map' style='width: 800px; height: 600px;'></div>
+   <script>
+      mapboxgl.accessToken = YOUR_TOKEN';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'YOUR_STYLE_URL'
+      });
+
+      // Add zoom and rotation controls to the map.
+      map.addControl(new mapboxgl.NavigationControl());
+   </script>
+
+

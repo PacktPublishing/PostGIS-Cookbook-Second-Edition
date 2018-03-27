@@ -1,0 +1,121 @@
+--Chapter 9
+--Recipe 1
+
+-- Getting ready
+--Step 1.
+create schema chp09;
+
+--Step 4.
+mapserv -v 
+
+--Step 6.
+shp2pgsql -s 4326 -W LATIN1 -g the_geom -I TM_WORLD_BORDERS-0.3.shp chp09.countries > countries.sql
+
+psql -U me -d postgis_cookbook -f countries.sql
+
+--How to do it
+--Step 1 countries.map 
+MAP # Start of mapfile
+  NAME 'population_per_country_map'
+  IMAGETYPE         PNG
+  EXTENT            -180 -90 180 90
+  SIZE              800 400
+  IMAGECOLOR        255 255 255
+
+  # map projection definition
+  PROJECTION
+    'init=epsg:4326'
+  END
+
+  # web section: here we define the ows services
+  WEB
+    # WMS and WFS server settings
+    METADATA
+      'ows_enable_request'          '*'
+      'ows_title'                   'Mapserver sample map'
+      'ows_abstract'                'OWS services about 
+                                    population per 
+                                    country map'
+      'wms_onlineresource'          'http://localhost/cgi-
+                                    bin/mapserv?map=/var
+                                    /www/data/
+                                    countries.map&'
+      'ows_srs'                     'EPSG:4326 EPSG:900913 
+                                    EPSG:3857'
+      'wms_enable_request'          'GetCapabilities, 
+                                    GetMap, 
+                                    GetFeatureInfo'
+      'wms_feature_info_mime_type'  'text/html'
+    END
+  END
+
+  # Start of layers definition
+  LAYER # Countries polygon layer begins here
+    NAME            countries
+    CONNECTIONTYPE  POSTGIS
+    CONNECTION      'host=localhost dbname=postgis_cookbook 
+                    user=me password=mypassword port=5432'
+    DATA            'the_geom from chp09.countries'
+    TEMPLATE 'template.html'
+    METADATA
+      'ows_title' 'countries'
+      'ows_abstract' 'OWS service about population per 
+        country map in 2005'
+      'gml_include_items' 'all'
+    END
+    STATUS          ON
+    TYPE            POLYGON
+    # layer projection definition
+    PROJECTION
+      'init=epsg:4326'
+    END
+
+    # we define 3 population classes based on the pop2005 
+      attribute
+    CLASSITEM 'pop2005'
+    CLASS # first class
+      NAME '0 - 50M inhabitants'
+      EXPRESSION ( ([pop2005] >= 0) AND ([pop2005] <= 
+        50000000) )
+      STYLE
+        WIDTH 1
+        OUTLINECOLOR 0 0 0
+        COLOR 254 240 217
+      END # end of style
+    END # end of first class
+    CLASS # second class
+      NAME '50M - 200M inhabitants'
+      EXPRESSION ( ([pop2005] > 50000000) AND 
+        ([pop2005] <= 200000000) )
+      STYLE
+        WIDTH 1
+        OUTLINECOLOR 0 0 0
+        COLOR 252 141 89
+      END # end of style
+    END # end of second class
+    CLASS # third class
+      NAME '> 200M inhabitants'
+      EXPRESSION ( ([pop2005] > 200000000) )
+      STYLE
+        WIDTH 1
+        OUTLINECOLOR 0 0 0
+        COLOR 179 0 0
+      END # end of style
+    END # end of third class
+
+  END # Countries polygon layer ends here
+
+END # End of mapfile
+
+--Step 3. template.html 
+<!-- MapServer Template -->
+<ul>
+  <li><strong>Name: </strong>[item name=name]</li>
+  <li><strong>ISO2: </strong>[item name=iso2]</li>
+  <li><strong>ISO3: </strong>[item name=iso3]</li>
+  <li>
+    <strong>Population 2005:</strong> [item name=pop2005]
+  </li>
+</ul>
+
+

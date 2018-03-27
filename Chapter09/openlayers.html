@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <title>OpenLayers Example</title>
+    <script src="http://openlayers.org/api/OpenLayers.js"></script>
+    <script src="http://maps.google.com/maps/api/js?v=3&sensor=false&key=AIzaSyC_xgevHlh8fg8Pu14V48a176SXY5WDf5k"></script>
+  </head>
+  <body>
+    
+    <div style="width:700px; height:400px" id="map"></div>
+    
+    <script defer="defer" type="text/javascript">
+    
+      // instantiate the map object
+      var map = new OpenLayers.Map("map", { 
+          controls: [],
+          projection: new OpenLayers.Projection("EPSG:900913")
+      });
+      
+      // add some controls on the map
+      map.addControl(new OpenLayers.Control.Navigation());
+      map.addControl(new OpenLayers.Control.PanZoomBar()),
+      map.addControl(new OpenLayers.Control.LayerSwitcher(
+          {"div":OpenLayers.Util.getElement("layerswitcher")}));
+      map.addControl(new OpenLayers.Control.MousePosition());
+      
+      // set the Google layers
+      var google_hyb = new OpenLayers.Layer.Google(
+          "Google Hybrid",
+          {type: google.maps.MapTypeId.HYBRID, numZoomLevels: 20}
+      );
+      var google_ter = new OpenLayers.Layer.Google(
+          "Google Terrain",
+          {type: google.maps.MapTypeId.TERRAIN}
+      );
+      
+      // set the WMS
+      var geoserver_url = "http://localhost:8080/geoserver/wms";
+      var mapserver_url = "http://localhost/cgi-bin/mapserv?map=/Library/WebServer/Documents/countries.map&"
+      
+      // set the GeoServer WMS
+      var geoserver_wms = new OpenLayers.Layer.WMS( "GeoServer WMS",
+          geoserver_url,
+          {   layers: "postgis_cookbook:counties",
+              transparent: "true",
+              format: "image/png",
+          },
+          {
+            isBaseLayer: false,
+            opacity: 0.4
+          } );
+      
+      // set the MapServer WMS
+      var mapserver_wms = new OpenLayers.Layer.WMS( "MapServer WMS",
+          mapserver_url,
+          {   layers: "countries",
+              transparent: "true",
+              format: "image/png",
+          },
+          {
+            isBaseLayer: false
+          } );
+      
+      // add all of the layers to the map
+      map.addLayers([mapserver_wms, geoserver_wms, google_ter, google_hyb]);
+      map.zoomToMaxExtent();
+      
+      // add the WMSGetFeatureInfo control
+      //OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
+      
+      var info = new OpenLayers.Control.WMSGetFeatureInfo({
+          url: geoserver_url,
+          title: 'Identify',
+          queryVisible: true,
+          eventListeners: {
+              getfeatureinfo: function(event) {
+                  map.addPopup(new OpenLayers.Popup.FramedCloud(
+                      "WMSIdentify", 
+                      map.getLonLatFromPixel(event.xy),
+                      null,
+                      event.text,
+                      null,
+                      true
+                  ));
+              }
+          }
+        });
+        map.addControl(info);
+        info.activate();
+      
+      // center map
+      var cpoint = new OpenLayers.LonLat(-11000000, 4800000);
+      map.setCenter(cpoint, 3);
+      
+    </script>
+  </body>
+</html>
+

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mapbox</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' rel='stylesheet' />
+
+    
+  </head>
+  <body>
+    
+    <h1>Some Tracks</h1>
+    
+    <div id='map' style='width: 800px; height: 600px;'></div>
+    <script>
+      mapboxgl.accessToken = 'YOUR_TOKEN';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'YOUR_STYLE'
+      });
+
+      // Add zoom and rotation controls to the map.
+      map.addControl(new mapboxgl.NavigationControl());
+    </script>
+    
+  </body>
+</html>

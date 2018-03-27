@@ -1,0 +1,19 @@
+--Chapter 9
+--Recipe 5
+
+--How to do it
+--Step 10.
+CREATE TABLE chp09.sites
+(
+  gid serial NOT NULL,
+  the_geom geometry(Point,4326),
+  CONSTRAINT sites_pkey PRIMARY KEY (gid )
+);
+CREATE INDEX sites_the_geom_gist ON chp09.sites
+  USING gist (the_geom );
+
+
+
+
+
+
