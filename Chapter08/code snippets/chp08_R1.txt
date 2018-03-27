@@ -1,0 +1,26 @@
+--Chapter 8
+--Recipe 1
+
+--Step 1.
+cd ~/virtualenvs
+virtualenv --no-site-packages postgis-cb-env
+source postgis-cb-env/bin/activate
+
+--Step 2.
+pip install simplejson
+pip install psycopg2
+pip install numpy
+pip install requests
+pip install gdal
+pip install geopy
+
+--Step 3.
+ls /home/capooti/virtualenv/postgis-cb-env/lib/python2.7/site-packages
+
+--If you are using Windows, follow these steps:
+
+--Step 3.
+python ez_setup.py
+python get-pip.py
+pip install requests
+pip install geopy
