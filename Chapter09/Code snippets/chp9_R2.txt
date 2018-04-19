@@ -1,0 +1,66 @@
+--Chapter 9
+--Recipe 2
+
+-- Getting ready
+--Step 1.
+ogr2ogr -f PostgreSQL -a_srs EPSG:4326 -lco GEOMETRY_NAME=the_geom -nln chp09.counties PG:"dbname='postgis_cookbook' user='me' password='mypassword'" countyp020.shp
+
+
+--How to do it
+--Step 9 
+<?xml version="1.0" encoding="UTF-8"?>
+<sld:StyledLayerDescriptor xmlns="http://www.opengis.net/sld" 
+  xmlns:sld="http://www.opengis.net/sld" 
+  xmlns:ogc="http://www.opengis.net/ogc" 
+  xmlns:gml="http://www.opengis.net/gml" version="1.0.0">
+  <sld:NamedLayer>
+    <sld:Name>county_classification</sld:Name>
+    <sld:UserStyle>
+      <sld:Name>county_classification</sld:Name>
+      <sld:Title>County area classification</sld:Title>
+      <sld:FeatureTypeStyle>
+        <sld:Name>name</sld:Name>
+        <sld:Rule>
+          <sld:Title>Large counties</sld:Title>
+          <ogc:Filter>
+            <ogc:PropertyIsGreaterThanOrEqualTo>
+              <ogc:PropertyName>square_mil</ogc:PropertyName>
+              <ogc:Literal>5000</ogc:Literal>
+            </ogc:PropertyIsGreaterThanOrEqualTo>
+          </ogc:Filter>
+          <sld:PolygonSymbolizer>
+            <sld:Fill>
+              <sld:CssParameter 
+                name="fill">#FF0000</sld:CssParameter>
+            </sld:Fill>
+            <sld:Stroke/>
+          </sld:PolygonSymbolizer>
+        </sld:Rule>
+        <sld:Rule>
+          <sld:Title>Small counties</sld:Title>
+          <ogc:Filter>
+            <ogc:PropertyIsLessThan>
+              <ogc:PropertyName>square_mil</ogc:PropertyName>
+              <ogc:Literal>5000</ogc:Literal>
+            </ogc:PropertyIsLessThan>
+          </ogc:Filter>
+          <sld:PolygonSymbolizer>
+            <sld:Fill>
+              <sld:CssParameter 
+                name="fill">#0000FF</sld:CssParameter>
+            </sld:Fill>
+            <sld:Stroke/>
+          </sld:PolygonSymbolizer>
+        </sld:Rule>
+      </sld:FeatureTypeStyle>
+    </sld:UserStyle>
+  </sld:NamedLayer>
+</sld:StyledLayerDescriptor>
+
+--Step 15.
+http://localhost:8080/geoserver/postgis_cookbook/wms?LAYERS=postgis_cookbook%3Acounties&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A4326&BBOX=-200.50286594033,7.6152902245522,-43.196688503029,81.457450330258&WIDTH=703&HEIGHT=330 
+
+--Step 16.
+http://localhost:8080/geoserver/postgis_cookbook/wms?REQUEST=GetFeatureInfo&EXCEPTIONS=application%2Fvnd.ogc.se_xml&BBOX=-126.094303%2C37.16812%2C-116.262667%2C41.783255&SERVICE=WMS&INFO_FORMAT=text%2Fhtml&QUERY_LAYERS=postgis_cookbook%3Acounties&FEATURE_COUNT=50&Layers=postgis_cookbook%3Acounties&WIDTH=703&HEIGHT=330&format=image%2Fpng&styles=&srs=EPSG%3A4326&version=1.1.1&x=330&y=158
+
+

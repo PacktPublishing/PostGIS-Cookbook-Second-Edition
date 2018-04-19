@@ -1,0 +1,82 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  <title>Consuming a WFS-T with OpenLayers</title>
+  <script src="http://openlayers.org/api/OpenLayers.js"></script>
+</head>
+<body>
+    
+    <div style="width:900px; height:400px" id="map"></div>
+
+    <script type="text/javascript">
+
+        // set the proxy
+        //OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";
+
+        // create the map
+        var map = new OpenLayers.Map('map');
+        
+        // create an OSM base layer
+        var osm = new OpenLayers.Layer.OSM();
+    
+        // create the wfs layer
+        var saveStrategy = new OpenLayers.Strategy.Save();
+        var wfs = new OpenLayers.Layer.Vector(
+        "Sites",
+        {
+            strategies: [new OpenLayers.Strategy.BBOX(), saveStrategy],
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            styleMap: new OpenLayers.StyleMap({
+                    pointRadius: 7,
+                    fillColor: "#FF0000"
+            }),
+            protocol: new OpenLayers.Protocol.WFS({
+                version: "1.1.0",
+                srsName: "EPSG:4326",
+                url: "http://localhost:8080/geoserver/wfs",
+                featurePrefix: 'postgis_cookbook',
+                featureType: "sites",
+                featureNS: "http://www.packtpub.com/postgis-cookbook/book",
+                geometryName: "the_geom"
+            })
+        });
+        
+        // add layers to map and center it
+        map.addLayers([osm, wfs]);
+        var fromProjection = new OpenLayers.Projection("EPSG:4326");
+        var toProjection   = new OpenLayers.Projection("EPSG:900913");
+        var cpoint = new OpenLayers.LonLat(12.5, 41.85).transform( fromProjection, toProjection);
+        map.setCenter(cpoint, 10);
+
+        // create a panel for tools
+        var panel = new OpenLayers.Control.Panel({
+            displayClass: "olControlEditingToolbar"
+        });
+
+        // create a draw point tool
+        var draw = new OpenLayers.Control.DrawFeature(
+            wfs, OpenLayers.Handler.Point,
+            {
+                handlerOptions: {freehand: false, multi: false},
+                displayClass: "olControlDrawFeaturePoint"
+            }
+        );
+        
+        // create a save tool
+        var save = new OpenLayers.Control.Button({
+            title: "Save Features",
+            trigger: function() {
+                saveStrategy.save();
+            },
+            displayClass: "olControlSaveFeatures"
+        });
+       
+        // add tools to panel and add it to map
+        panel.addControls([
+            new OpenLayers.Control.Navigation(),
+            save, draw
+        ]);
+        map.addControl(panel);
+        
+    </script>
+</body>
+</html>

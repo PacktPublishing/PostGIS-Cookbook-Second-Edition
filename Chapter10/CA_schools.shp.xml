@@ -1,0 +1,3 @@
+<?xml version="1.0"?>
+<!--<!DOCTYPE metadata SYSTEM "http://www.esri.com/metadata/esriprof80.dtd">-->
+<metadata xml:lang="en"><Esri><CreaDate>20120724</CreaDate><CreaTime>08460500</CreaTime><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process Name="DeleteFeatures_18" ToolSource="C:\Program Files\ArcGIS\ArcToolbox\Toolboxes\Data Management Tools.tbx\DeleteFeatures" Date="20080116" Time="130629">DeleteFeatures C:\Projects\HazusDataConversion\SchoolEF\CA1\EF.mdb\hzSchool C:\Projects\HazusDataConversion\SchoolEF\CA1\EF.mdb\hzSchool</Process></lineage></DataProperties><ArcGISFormat>1.0</ArcGISFormat></Esri></metadata>

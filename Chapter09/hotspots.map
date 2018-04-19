@@ -1,0 +1,70 @@
+MAP # Start of mapfile
+  NAME 'hotspots_time_series'
+  IMAGETYPE         PNG
+  EXTENT            -180 -90 180 90
+  SIZE              800 400
+  IMAGECOLOR        255 255 255
+
+  # map projection definition
+  PROJECTION
+    'init=epsg:4326'
+  END
+
+  # a symbol for hotspots
+  SYMBOL
+    NAME "circle"
+    TYPE ellipse
+    FILLED true
+    POINTS
+      1 1
+    END
+  END
+
+  # web section: here we define the ows services
+  WEB
+    # WMS and WFS server settings
+    METADATA
+      'wms_name'                'Hotspots'
+      'wms_title'               'World hotspots time 
+                                series'
+      'wms_abstract'            'Active fire data detected 
+                                by NASA Earth Observing 
+                                System Data and Information 
+                                System (EOSDIS)'
+      'wms_onlineresource'      'http://localhost/cgi-bin/
+                                mapserv?map=/var/www/data/
+                                hotspots.map&'
+      'wms_srs'                 'EPSG:4326 EPSG:3857'
+      'wms_enable_request' '*'
+      'wms_feature_info_mime_type'  'text/html'
+    END
+  END
+
+  # Start of layers definition
+  LAYER # Hotspots point layer begins here
+    NAME            hotspots
+    CONNECTIONTYPE  POSTGIS
+    CONNECTION      'host=localhost dbname=postgis_cookbook 
+                    user=me
+                      password=mypassword port=5432'
+    DATA            'the_geom from chp09.hotspots'
+    TEMPLATE 'template.html'
+    METADATA
+  'wms_title'                   'World hotspots time series'
+  'gml_include_items' 'all'
+  'wms_timeextent' '2000-01-01/2020-12-31' # time extent for which the service will give a response
+  'wms_timeitem' 'acq_date' # layer field to use to filter on the TIME parameter
+  'wms_timedefault' '2013-05-30' # default parameter if not added to the request
+
+    END
+    STATUS          ON
+    TYPE            POINT
+    CLASS
+      SYMBOL 'circle'
+      SIZE 4
+      COLOR        255 0 0
+    END # end of class
+
+  END # hotspots layer ends here
+
+END # End of mapfile

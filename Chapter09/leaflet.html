@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Leaflet Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  </head>
+  <body>
+    
+    <div id="map" style="width:800px; height:500px"></div>
+
+    <script type="text/javascript">
+    
+    // osm layer
+    var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: "Data by OpenStreetMap"
+    });
+    
+    // mapserver layer
+    var ms_url = "http://localhost/cgi-bin/mapserv?map=/Library/WebServer/Documents/countries.map&";
+    var countries = L.tileLayer.wms(ms_url, {
+        layers: 'countries',
+        format: 'image/png',
+        transparent: true,
+        opacity: 0.7
+    });
+    
+    // map creation
+    var map = new L.Map('map', {
+        center: new L.LatLng(15, 0), 
+        zoom: 2,
+        layers: [osm, countries],
+        zoomControl: true
+    });
+
+    // getfeatureinfo event
+    map.addEventListener('click', Identify);
+
+    function Identify(e) {
+        // set parameters needed for GetFeatureInfo WMS request
+        var BBOX = map.getBounds().toBBoxString();
+        var WIDTH = map.getSize().x;
+        var HEIGHT = map.getSize().y;
+        var X = map.layerPointToContainerPoint(e.layerPoint).x;
+        var Y = map.layerPointToContainerPoint(e.layerPoint).y;
+        // compose the URL for the request
+        var URL = ms_url + 'SERVICE=WMS&VERSION=1.1.1&REQUEST=GetFeatureInfo&LAYERS=countries&QUERY_LAYERS=countries&BBOX='+BBOX+'&FEATURE_COUNT=1&HEIGHT='+HEIGHT+'&WIDTH='+WIDTH+'&INFO_FORMAT=text%2Fhtml&SRS=EPSG%3A4326&X='+X+'&Y='+Y;
+        //send the asynchronous HTTP request using jQuery $.ajax
+        $.ajax({
+            url: URL,
+            dataType: "html",
+            type: "GET",
+            success: function(data) {
+                  var popup = new L.Popup({
+                    maxWidth: 300
+                  });
+                  popup.setContent(data);
+                  popup.setLatLng(e.latlng);
+                  map.openPopup(popup);
+            }
+        });
+    }
+    
+    </script>
+    
+  </body>
+</html>
+
